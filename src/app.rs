@@ -178,6 +178,15 @@ pub enum DiffViewMode {
     SideBySide,
 }
 
+impl DiffViewMode {
+    fn name(&self) -> &str {
+        match self {
+            Self::Unified => "unified",
+            Self::SideBySide => "side-by-side",
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MessageType {
     Info,
@@ -953,23 +962,21 @@ impl App {
     }
 
     pub fn set_message(&mut self, msg: impl Into<String>) {
-        self.message = Some(Message {
-            content: msg.into(),
-            message_type: MessageType::Info,
-        });
+        self.set_msg(msg.into(), MessageType::Info)
     }
 
     pub fn set_warning(&mut self, msg: impl Into<String>) {
-        self.message = Some(Message {
-            content: msg.into(),
-            message_type: MessageType::Warning,
-        });
+        self.set_msg(msg.into(), MessageType::Warning)
     }
 
     pub fn set_error(&mut self, msg: impl Into<String>) {
+        self.set_msg(msg.into(), MessageType::Error)
+    }
+
+    pub fn set_msg(&mut self, msg: impl Into<String>, message_type: MessageType) {
         self.message = Some(Message {
             content: msg.into(),
-            message_type: MessageType::Error,
+            message_type: message_type,
         });
     }
 
@@ -2286,11 +2293,7 @@ impl App {
             DiffViewMode::Unified => DiffViewMode::SideBySide,
             DiffViewMode::SideBySide => DiffViewMode::Unified,
         };
-        let mode_name = match self.diff_view_mode {
-            DiffViewMode::Unified => "unified",
-            DiffViewMode::SideBySide => "side-by-side",
-        };
-        self.set_message(format!("Diff view mode: {mode_name}"));
+        self.set_message(format!("Diff view mode: {}", self.diff_view_mode.name()));
         self.rebuild_annotations();
     }
 

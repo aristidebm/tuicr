@@ -1,4 +1,10 @@
-.PHONY: build
+.PHONY: build format test
 
 build:
-	cargo build
+	@cargo build
+
+format:
+	@cargo fmt
+
+test:
+	@cargo test
